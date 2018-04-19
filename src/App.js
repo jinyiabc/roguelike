@@ -86,6 +86,21 @@ class App extends Component {
         maxTunnels--; // we created a whole tunnel so lets decrement how many we have left to create
       }
     }
+
+    let availableMap = [];
+    for(let i=0; i< dimensions; i++){
+        for(let j=0; j< dimensions; j++){
+            if(map[i][j] === 0){
+                availableMap.push([i,j]);
+            }
+        }
+    }
+
+    let random = Math.floor(Math.random() * (availableMap.length));
+    let meRow = availableMap[random][0], // start row - start at a random spot
+    meColumn = availableMap[random][1]; // start column - start at a random spot
+    map[meRow][meColumn] = 2
+    // console.log(map);
     return map; // all our tunnels have been created and our map is complete, so lets return it to our render()
   };
 
@@ -94,6 +109,17 @@ class App extends Component {
     this.forceUpdate()
   }
 
+  selectClass(num){
+      if( num === 0 ){
+          return 'tunnel';
+      } else if( num === 1 ) {
+          return 'wall';
+      } else {
+          console.log('this is 2');
+          return 'me'
+      }
+
+  }
   render() {
     let grid = this.createMap();
     return (
@@ -115,9 +141,7 @@ class App extends Component {
         <table className="grid">
           <thead>
             {grid.map((obj, row) => <tr key={row}>{obj.map((obj2, col) =>< td className = {
-                obj2 === 1
-                  ? 'wall'
-                  : 'tunnel'
+                this.selectClass(obj2)
               }
               key = {
                 col

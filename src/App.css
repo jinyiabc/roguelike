@@ -53,12 +53,20 @@ td {
   content: "0";
 }
 
+.me:before {
+  content: "2";
+}
+
 .wall {
   background: #636363;
 }
 
 .tunnel {
   background: transparent;
+}
+
+.me {
+    background: #0000FF;
 }
 
 .form-control {
