@@ -1,5 +1,9 @@
 import React, {Component} from 'react';
 import './App.css';
+import { createStore } from 'redux';
+import { Provider } from 'react-redux'
+import { reducers } from './reducers/index';
+
 
 class App extends Component {
   constructor(props) {
@@ -122,7 +126,14 @@ class App extends Component {
   }
   render() {
     let grid = this.createMap();
+    const initial_state = {
+        map: grid
+    }
+    // create the store
+    const store = createStore(reducers, initial_state);
+
     return (
+    <Provider store={store}>
       <div >
         {/* <div className="form-group row text-center">
           <div className="inline">
@@ -149,6 +160,7 @@ class App extends Component {
           </thead>
         </table>
       </div>
+    </Provider>
     );
   }
 }
