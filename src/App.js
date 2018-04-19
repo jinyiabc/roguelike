@@ -105,7 +105,10 @@ class App extends Component {
     meColumn = availableMap[random][1]; // start column - start at a random spot
     map[meRow][meColumn] = 2
     // console.log(map);
-    return map; // all our tunnels have been created and our map is complete, so lets return it to our render()
+    return {
+        maps:map,
+        position:[meRow, meColumn]
+            }; // all our tunnels have been created and our map is complete, so lets return it to our render()
   };
 
   onClick(e) {
@@ -124,17 +127,35 @@ class App extends Component {
       }
 
   }
+
+  arrowKey(e){
+      alert('hi');
+      //     switch (e.keyCode) {
+      //     case 37:
+      //         alert('left');
+      //         break;
+      //     case 38:
+      //         alert('up');
+      //         break;
+      //     case 39:
+      //         alert('right');
+      //         break;
+      //     case 40:
+      //         alert('down');
+      //         break;
+      // }
+  }
   render() {
-    let grid = this.createMap();
-    const initial_state = {
-        map: grid
-    }
+    let maps = this.createMap();
+    let grid = maps.maps;
+    let position = maps.position;
+    console.log(position);
     // create the store
-    const store = createStore(reducers, initial_state);
+    const store = createStore(reducers, {maps:grid});
 
     return (
     <Provider store={store}>
-      <div >
+      <div onKeyDown={this.arrowKey}>
         {/* <div className="form-group row text-center">
           <div className="inline">
             <label>dimensions</label>

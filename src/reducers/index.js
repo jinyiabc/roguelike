@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 
-import users from './users';
+import maps from './maps';
 
 export const reducers = combineReducers({
-    users: users,
+    maps: maps,
 });
