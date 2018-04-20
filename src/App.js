@@ -8,10 +8,21 @@ import { reducers } from './reducers/index';
 class App extends Component {
   constructor(props) {
     super(props);
+      let maps = this.createMap();
+      let grid = maps.maps;
+      let player = maps.player;
+      let enemy = maps.enemy;
+      let medicine = maps.medicine;
+      let location = maps.location
     this.state = {
-      dimensions: 30,
-      maxTunnels: 100,
-      maxLength: 8
+      // dimensions: 30,
+      // maxTunnels: 100,
+      // maxLength: 8,
+      maps: grid,
+      player: player,
+      enemy: enemy,
+      medicine: medicine,
+      location: location
     };
     this.onClick = this.onClick.bind(this);
     this.onChange = this.onChange.bind(this);
@@ -44,9 +55,10 @@ class App extends Component {
 
   //lets create a randomly generated map for our dungeon crawler
   createMap() {
-    let dimensions = this.state.dimensions, // width and height of the map
-      maxTunnels = this.state.maxTunnels, // max number of tunnels possible
-      maxLength = this.state.maxLength, // max length each tunnel can have
+
+    let dimensions = 30, // width and height of the map
+      maxTunnels = 100, // max number of tunnels possible
+      maxLength = 8, // max length each tunnel can have
       map = this.createArray(1, dimensions), // create a 2d array full of 1's
       currentRow = Math.floor(Math.random() * dimensions), // our current row - start at a random spot
       currentColumn = Math.floor(Math.random() * dimensions), // our current column - start at a random spot
@@ -103,11 +115,33 @@ class App extends Component {
     let random = Math.floor(Math.random() * (availableMap.length));
     let meRow = availableMap[random][0], // start row - start at a random spot
     meColumn = availableMap[random][1]; // start column - start at a random spot
-    map[meRow][meColumn] = 2
-    // console.log(map);
+    map[meRow][meColumn] = 2;
+    // console.log(availableMap);
+
+    const newAvailableMap = availableMap.filter((element) => {
+        return !(element[0] === meRow && element[1] === meColumn)
+    })
+    // console.log(newAvailableMap);
+    let random1 = Math.floor(Math.random() * (newAvailableMap.length));
+    let enemyRow = newAvailableMap[random1][0], // start row - start at a random spot
+    enemyColumn = newAvailableMap[random1][1]; // start column - start at a random spot
+    map[enemyRow][enemyColumn] = 3;
+
+    const newAvailableMap2 = newAvailableMap.filter((element) => {
+        return !(element[0] === enemyRow && element[1] === enemyColumn)
+    })
+    // console.log(newAvailableMap2);
+    let random2 = Math.floor(Math.random() * (newAvailableMap2.length));
+    let medicineRow = newAvailableMap2[random2][0], // start row - start at a random spot
+    medicineColumn = newAvailableMap2[random2][1]; // start column - start at a random spot
+    map[medicineRow][medicineColumn] = 4;
+
     return {
         maps:map,
-        position:[meRow, meColumn]
+        location: [meRow, meColumn],
+        player:100,
+        enemy: 120,
+        medicine:30
             }; // all our tunnels have been created and our map is complete, so lets return it to our render()
   };
 
@@ -121,41 +155,118 @@ class App extends Component {
           return 'tunnel';
       } else if( num === 1 ) {
           return 'wall';
+      } else if ( num === 3 ) {
+          return 'enemy';
+      } else if ( num === 4 ) {
+          return 'medicine';
       } else {
-          console.log('this is 2');
+          // console.log('this is 2');
           return 'me'
       }
 
   }
 
   arrowKey(e){
-      alert('hi');
-      //     switch (e.keyCode) {
-      //     case 37:
-      //         alert('left');
-      //         break;
-      //     case 38:
-      //         alert('up');
-      //         break;
-      //     case 39:
-      //         alert('right');
-      //         break;
-      //     case 40:
-      //         alert('down');
-      //         break;
-      // }
+      let vector = [0,0];
+      switch (e.keyCode) {
+        case 37:   // left
+          vector = [-1,0] // {x: -1, y: 0};
+          break;
+        case 38:  // up
+          vector = [0,-1] // {x: 0, y: -1};
+          break;
+        case 39:  // right
+          vector = [1,0] // {x: 1, y: 0};
+          break;
+        case 40:  // down
+          vector = [0,1] // {x: 0, y: 1};
+          break;
+        default:
+          vector = [0,0];
+          break;
+      }
+      if (vector) {
+        e.preventDefault();
+        this.handleMove(vector);
+      }
   }
+
+  handleMove(vector){
+      const state = this.state;
+      const player = state.player;
+      const medicine = state.medicine;
+      const enemy = state.enemy;
+      const maps = state.maps;
+      const location = state.location;
+      // console.log(player);
+      // console.log(vector);
+      const x = location[0];
+      const y = location[1];
+      const y1 = vector[0];
+      const x1 = vector[1];
+      let newLocation;
+      let newPlayer = player;
+
+
+      if(maps[x+x1][y+y1] === 0){     // able to move
+          maps[x+x1][y+y1] = 2;
+          maps[x][y] = 0 ;
+          newLocation = [x+x1, y+y1];
+      } else if (maps[x+x1][y+y1] === 4) {  // medicine
+         maps[x+x1][y+y1] = 2;
+         maps[x][y] = 0 ;
+         newLocation = [x+x1, y+y1];
+         newPlayer = player + medicine;
+     } else if (maps[x+x1][y+y1] === 3) { // enemy
+         if(player > enemy){
+             alert('You win!')
+         } else {
+             alert('OOPS, You lose!')
+         }
+
+      } else {                        // 1 unable to move
+          maps[x][y] = 2 ;
+          newLocation = location;
+      }
+      // console.log(vector);
+      // console.log(newPlayer);
+      this.setState(
+          {maps: maps, location:newLocation, player: newPlayer}
+      )
+
+  }
+
+
+
+  componentDidMount() {
+    window.addEventListener('keydown', this.arrowKey.bind(this)); //notice .bind
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.arrowKey.bind(this));
+  }
+
   render() {
-    let maps = this.createMap();
-    let grid = maps.maps;
-    let position = maps.position;
-    console.log(position);
+    // let maps = this.createMap();
+    let grid = this.state.maps;
+    // let position = maps.position;
+    //
+    // this.setState((grid,position) => {return {maps: grid, player: position}});
+    // console.log(position);
+
+
     // create the store
     const store = createStore(reducers, {maps:grid});
 
     return (
     <Provider store={store}>
-      <div onKeyDown={this.arrowKey}>
+    <div id = 'game'>
+      <ul id = 'ui'>
+        <li id = 'health'><span className = 'label'>Player Health:</span> {this.state.player}</li>
+        <li id = ''><span className = 'label'>Enemy Health:</span> {this.state.enemy}</li>
+
+      </ul>
+      <div>
         {/* <div className="form-group row text-center">
           <div className="inline">
             <label>dimensions</label>
@@ -180,6 +291,7 @@ class App extends Component {
               } > </td>)}</tr>)}
           </thead>
         </table>
+      </div>
       </div>
     </Provider>
     );

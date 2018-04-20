@@ -57,6 +57,15 @@ td {
   content: "2";
 }
 
+.enemy:before {
+  content: "3";
+}
+
+.medicine:before {
+  content: "4";
+}
+
+
 .wall {
   background: #636363;
 }
@@ -67,6 +76,14 @@ td {
 
 .me {
     background: #0000FF;
+}
+
+.enemy {
+    background: #FF0000;
+}
+
+.medicine {
+    background: #008000;
 }
 
 .form-control {
@@ -132,4 +149,18 @@ td {
     height: 2em;
     font-size: 1em;
   }
+}
+
+#ui {
+  padding-left: 10px;
+}
+
+#ui li {
+  list-style: none;
+  float: left;
+  padding: 5px 15px;
+  border-style: none;
+  board-width: 1px;
+  border-color: black;
+  font-family: Roboto
 }
